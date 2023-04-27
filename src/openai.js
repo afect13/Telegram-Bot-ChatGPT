@@ -1,13 +1,14 @@
 import { Configuration, OpenAIApi } from "openai";
-import config from "config";
 import { createReadStream } from "fs";
+import config from "config";
 
 class OpenAI {
   roles = {
     ASSISTANT: "assistant",
-    USER: "user",
     SYSTEM: "system",
+    USER: "user",
   };
+
   constructor(apiKey) {
     const configuration = new Configuration({
       apiKey,
@@ -15,15 +16,16 @@ class OpenAI {
     this.openai = new OpenAIApi(configuration);
   }
 
-  async chat(messages) {
+  async chat(messages = []) {
     try {
-      const response = await this.openai.createChatCompletion({
+      const completion = await this.openai.createChatCompletion({
         model: "gpt-3.5-turbo",
         messages,
       });
-      return response.data.choices[0].message;
+
+      return completion.data.choices[0].message;
     } catch (e) {
-      console.log("Error gpt chat", e.message);
+      console.error(`Error while chat completion: ${e.message}`);
     }
   }
 
@@ -32,7 +34,7 @@ class OpenAI {
       const response = await this.openai.createTranscription(createReadStream(filepath), "whisper-1");
       return response.data.text;
     } catch (e) {
-      console.log("error from transcription", e.message);
+      console.error(`Error while transcription: ${e.message}`);
     }
   }
 }
