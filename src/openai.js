@@ -23,7 +23,7 @@ class OpenAI {
         messages,
       });
 
-      return completion.data.choices[0].message;
+      return completion.data.choices[0]?.message;
     } catch (e) {
       console.error(`Error while chat completion: ${e.message}`);
     }
