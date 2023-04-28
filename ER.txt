@@ -1,0 +1,1 @@
+Error while proccessing text message Cannot read properties of undefined (reading 'content')
