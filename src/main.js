@@ -2,6 +2,7 @@ import { Telegraf, session } from "telegraf";
 import { message } from "telegraf/filters";
 import { proccessVoiceMessage, proccessTextMessage } from "./logic.js";
 import config from "config";
+import forever from "forever";
 export const INITIAL_SESSION = {
   messages: [],
 };
@@ -38,10 +39,26 @@ bot.start((ctx) => {
 
 bot.launch();
 
-process.once("SIGINT", () => {
-  bot.stop("SIGINT");
+const child = new forever.Monitor(__filename, {
+  max: 10,
+  silent: true,
+  args: [],
 });
 
-process.once("SIGTERM", () => {
-  bot.stop("SIGTERM");
+child.on("restart", () => {
+  console.log("Bot restarted due to an error");
 });
+
+child.on("exit", () => {
+  console.log("Bot has exited after 10 restarts");
+});
+
+child.start();
+
+// process.once("SIGINT", () => {
+//   bot.stop("SIGINT");
+// });
+
+// process.once("SIGTERM", () => {
+//   bot.stop("SIGTERM");
+// });
