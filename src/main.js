@@ -13,7 +13,7 @@ bot.use(session());
 bot.start((ctx) => {
   const userId = ctx.from.id;
   if (allowedUsers.includes(userId)) {
-    ctx.reply("Добро пожаловать!");
+    ctx.reply("Начнем? :) ");
     bot.command("new", async (ctx) => {
       ctx.session = INITIAL_SESSION;
       await ctx.reply("Жду вашего  сообщения");
