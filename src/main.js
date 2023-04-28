@@ -9,7 +9,6 @@ export const INITIAL_SESSION = {
 const bot = new Telegraf(config.get("TELEGRAM_TOKEN"));
 const allowedUsers = config.get("ALLOWED_USERS");
 bot.use(session());
-
 bot.start((ctx) => {
   const userId = ctx.from.id;
   if (allowedUsers.includes(userId)) {
