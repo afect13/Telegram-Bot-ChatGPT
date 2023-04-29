@@ -6,7 +6,7 @@ import { gptMessage, removeFile } from "./utils.js";
 export async function proccessVoiceMessage(ctx) {
   try {
     // await ctx.reply(code("Секунду. Жду ответ от ChatGPT"));
-
+    ctx.replyWithChatAction("typing");
     const link = await ctx.telegram.getFileLink(ctx.message.voice.file_id);
     const userId = String(ctx.message.from.id);
     const oggPath = await ogg.create(link.href, userId);
@@ -25,6 +25,7 @@ export async function proccessVoiceMessage(ctx) {
 
 export async function proccessTextMessage(ctx) {
   try {
+    ctx.replyWithChatAction("typing");
     // await ctx.reply(code("Секунду. Жду ответ от ChatGPT"));
     ctx.session.messages.push(gptMessage(ctx.message.text));
     const response = await openai.chat(ctx.session.messages);
