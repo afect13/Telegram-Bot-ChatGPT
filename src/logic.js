@@ -26,10 +26,13 @@ export async function proccessVoiceMessage(ctx) {
 export async function proccessTextMessage(ctx) {
   try {
     ctx.replyWithChatAction("typing");
-    // await ctx.reply(code("Секунду. Жду ответ от ChatGPT"));
-    ctx.session.messages.push(gptMessage(ctx.message.text));
+    const userMessage = ctx.message.text.trim();
+    if (!userMessage) {
+      await ctx.reply("Вы отправили пустое сообщение, пожалуйста, введите что-то еще.");
+      return;
+    }
+    ctx.session.messages.push(gptMessage(userMessage));
     const response = await openai.chat(ctx.session.messages);
-
     ctx.session.messages.push(gptMessage(response.content, openai.roles.ASSISTANT));
     await ctx.reply(response.content);
   } catch (e) {
