@@ -14,6 +14,7 @@ export async function proccessVoiceMessage(ctx) {
     const text = await openai.transcription(mp3Path);
     removeFile(mp3Path);
     await ctx.reply(code(`Ваш запрос: ${text}`));
+
     ctx.session.messages.push(gptMessage(text));
     const response = await openai.chat(ctx.session.messages);
     ctx.session.messages.push(gptMessage(response.content, openai.roles.ASSISTANT));
