@@ -21,10 +21,10 @@ class OpenAI {
         model: "gpt-3.5-turbo",
         messages,
       });
-      console.log(completion.data.choices[0].message);
       return completion.data.choices[0].message;
     } catch (e) {
       console.error(`Error while chat completion: ${e.message}`);
+      return { content: "Ошибка запроса к серверу, попробуйте еще раз" };
     }
   }
 
