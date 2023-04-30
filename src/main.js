@@ -52,16 +52,7 @@ bot.on(message("text"), async (ctx) => {
   await proccessTextMessage(ctx);
 });
 
-bot
-  .launch()
-  .then(() => {
-    bot.telegram.sendMessage(allowedUsers[0], "Сервер запущен!").catch((error) => {
-      console.error(`Ошибка при отправке сообщения: ${error.message}`);
-    });
-  })
-  .catch((error) => {
-    console.error(`Ошибка при запуске бота: ${error.message}`);
-  });
+bot.launch();
 
 process.once("SIGINT", () => {
   bot.stop("SIGINT");

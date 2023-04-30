@@ -1,7 +1,7 @@
 import { Configuration, OpenAIApi } from "openai";
 import { createReadStream } from "fs";
 import config from "config";
-
+import { exec } from "child_process";
 class OpenAI {
   roles = {
     ASSISTANT: "assistant",
@@ -21,10 +21,13 @@ class OpenAI {
         model: "gpt-3.5-turbo",
         messages,
       });
+
+      console.log("Usage", completion.data.usage);
       return completion.data.choices[0].message;
     } catch (e) {
       console.error(`Error while chat completion: ${e.message}`);
-      return { content: "Ошибка запроса к серверу, попробуйте еще раз" };
+      exec("npm run restart");
+      return { content: "Ошибка запроса к серверу, произвожу перезапуск систем. Повторите запрос через 3 секунды" };
     }
   }
 
