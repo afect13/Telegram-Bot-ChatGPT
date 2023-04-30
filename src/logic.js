@@ -5,7 +5,6 @@ import { gptMessage, removeFile } from "./utils.js";
 
 export async function proccessVoiceMessage(ctx) {
   try {
-    // await ctx.reply(code("Секунду. Жду ответ от ChatGPT"));
     ctx.replyWithChatAction("typing");
     const link = await ctx.telegram.getFileLink(ctx.message.voice.file_id);
     const userId = String(ctx.message.from.id);
@@ -14,11 +13,13 @@ export async function proccessVoiceMessage(ctx) {
     const text = await openai.transcription(mp3Path);
     removeFile(mp3Path);
     await ctx.reply(code(`Ваш запрос: ${text}`));
-    ctx.session.messages.push(gptMessage(text));
+    console.log(typeof text);
+    await ctx.session.messages.push(gptMessage(text));
     const response = await openai.chat(ctx.session.messages);
     ctx.session.messages.push(gptMessage(response.content, openai.roles.ASSISTANT));
     await ctx.reply(response.content);
   } catch (e) {
+    await ctx.reply(`Ошибка. ${e.message}`);
     console.error(`Error while proccessing voice message`, e.message);
   }
 }
@@ -26,16 +27,12 @@ export async function proccessVoiceMessage(ctx) {
 export async function proccessTextMessage(ctx) {
   try {
     ctx.replyWithChatAction("typing");
-    const userMessage = ctx.message.text.trim();
-    if (!userMessage) {
-      await ctx.reply("Вы отправили пустое сообщение, пожалуйста, введите что-то еще.");
-      return;
-    }
-    ctx.session.messages.push(gptMessage(userMessage));
+    ctx.session.messages.push(gptMessage(ctx.message.text));
     const response = await openai.chat(ctx.session.messages);
     ctx.session.messages.push(gptMessage(response.content, openai.roles.ASSISTANT));
     await ctx.reply(response.content);
   } catch (e) {
+    await ctx.reply(`Ошибка. ${e.message}`);
     console.error(`Error while proccessing text message`, e.message);
   }
 }

@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "dev": "nodemon ./src/main.js",
-    "start": "pm2 start ./src/main.js --name=my-bot --no-daemon --watch"
+    "start": "nodemon ./src/main.js",
+    "restart": "nodemon restart ./src/main.js"
   },
   "keywords": [],
   "author": "",
