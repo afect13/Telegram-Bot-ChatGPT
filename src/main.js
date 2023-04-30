@@ -33,13 +33,13 @@ bot.command("start", async (ctx) => {
 });
 
 bot.command("restart", async (ctx) => {
-  const userId = ctx.from.id;
-  if (userId === allowedUsers[0]) {
-    ctx.reply("Выполняю перезапуск сервера...");
-    exec("npm run restart");
-  } else {
-    ctx.reply("У вас нет прав на выполнение этой команды.");
-  }
+  // const userId = ctx.from.id;
+  // if (userId === allowedUsers[0]) {
+  ctx.reply("Выполняю перезапуск сервера...");
+  exec("npm run restart");
+  // } else {
+  //   ctx.reply("У вас нет прав на выполнение этой команды.");
+  // }
 });
 
 bot.on(message("voice"), async (ctx) => {

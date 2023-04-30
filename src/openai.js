@@ -1,7 +1,8 @@
 import { Configuration, OpenAIApi } from "openai";
 import { createReadStream } from "fs";
 import config from "config";
-import { exec } from "child_process";
+import { Context } from "telegraf";
+
 class OpenAI {
   roles = {
     ASSISTANT: "assistant",
@@ -14,6 +15,8 @@ class OpenAI {
       apiKey,
     });
     this.openai = new OpenAIApi(configuration);
+    // this.lastError = null;
+    // this.lastMessages = null;
   }
   async chat(messages = []) {
     try {
@@ -21,12 +24,12 @@ class OpenAI {
         model: "gpt-3.5-turbo",
         messages,
       });
-
-      console.log("Usage", completion.data.usage);
+      // this.lastError = null; // Сброс ошибки при успешном выполнении
+      // this.lastMessages = messages; // Сохранение сообщений при успешном выполнении
       return completion.data.choices[0].message;
     } catch (e) {
       console.error(`Error while chat completion: ${e.message}`);
-      exec("npm run restart");
+      return { content: "Ошибка попробуйте еще раз введите /restart" };
     }
   }
 
