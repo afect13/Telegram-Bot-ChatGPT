@@ -27,7 +27,6 @@ class OpenAI {
     } catch (e) {
       console.error(`Error while chat completion: ${e.message}`);
       exec("npm run restart");
-      return { content: "Ошибка запроса к серверу, произвожу перезапуск систем. Повторите запрос через 3 секунды" };
     }
   }
 
