@@ -1,7 +1,7 @@
 import { code } from "telegraf/format";
 import { openai } from "./openai.js";
 import { ogg } from "./ogg.js";
-import { gptMessage, removeFile } from "./utils.js";
+import { gptMessage, removeFile, trimSessionMessages, trimSessionMessagesAfterError, startSession } from "./utils.js";
 
 export async function proccessVoiceMessage(ctx) {
   try {
@@ -13,11 +13,22 @@ export async function proccessVoiceMessage(ctx) {
     const text = await openai.transcription(mp3Path);
     removeFile(mp3Path);
     await ctx.reply(code(`Ваш запрос: ${text}`));
-    console.log(typeof text);
     await ctx.session.messages.push(gptMessage(text));
+    if (ctx.session.messages.length > 8) {
+      trimSessionMessages(ctx.session.messages);
+    }
     const response = await openai.chat(ctx.session.messages);
-    ctx.session.messages.push(gptMessage(response.content, openai.roles.ASSISTANT));
-    await ctx.reply(response.content);
+    if (response.content === "ErrorSessionNeedTrimMessege") {
+      await ctx.reply(`Ошибка 🤖 Повторите запрос`);
+      if (ctx.session.messages.length > 2) {
+        trimSessionMessagesAfterError(ctx.session.messages);
+      } else {
+        ctx.session = startSession();
+      }
+    } else {
+      ctx.session.messages.push(gptMessage(response.content, openai.roles.ASSISTANT));
+      await ctx.reply(response.content);
+    }
   } catch (e) {
     await ctx.reply(`Ошибка. ${e.message}`);
     console.error(`Error while proccessing voice message`, e.message);
@@ -28,9 +39,22 @@ export async function proccessTextMessage(ctx) {
   try {
     ctx.replyWithChatAction("typing");
     ctx.session.messages.push(gptMessage(ctx.message.text));
+
+    if (ctx.session.messages.length > 8) {
+      trimSessionMessages(ctx.session.messages);
+    }
     const response = await openai.chat(ctx.session.messages);
-    ctx.session.messages.push(gptMessage(response.content, openai.roles.ASSISTANT));
-    await ctx.reply(response.content);
+    if (response.content === "ErrorSessionNeedTrimMessege") {
+      await ctx.reply(`Ошибка 🤖 Повторите запрос`);
+      if (ctx.session.messages.length > 2) {
+        trimSessionMessagesAfterError(ctx.session.messages);
+      } else {
+        ctx.session = startSession();
+      }
+    } else {
+      ctx.session.messages.push(gptMessage(response.content, openai.roles.ASSISTANT));
+      await ctx.reply(response.content);
+    }
   } catch (e) {
     await ctx.reply(`Ошибка. ${e.message}`);
     console.error(`Error while proccessing text message`, e.message);
