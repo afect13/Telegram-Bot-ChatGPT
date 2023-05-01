@@ -13,9 +13,9 @@ export const gptMessage = (content, role = "user") => ({
   role,
 });
 
-export const startSession = () => ({
-  messages: [],
-});
+// export const startSession = () => ({
+//   messages: [],
+// });
 
 export const trimSessionMessages = (messages) => {
   const excess = messages.length - 8;
