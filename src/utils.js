@@ -19,9 +19,9 @@ export const startSession = () => ({
 
 export const trimSessionMessages = (messages) => {
   const excess = messages.length - 8;
-  messages.splice(0, excess);
+  messages.splice(-excess);
 };
 
 export const trimSessionMessagesAfterError = (messages) => {
-  messages.splice(0, 2);
+  messages.splice(-2);
 };
