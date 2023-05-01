@@ -55,6 +55,8 @@ export async function proccessTextMessage(ctx) {
       ctx.session.messages.push(gptMessage(response.content, openai.roles.ASSISTANT));
       await ctx.reply(response.content);
     }
+    console.log(ctx.session.messages);
+    console.log(".........................");
   } catch (e) {
     await ctx.reply(`Ошибка. ${e.message}`);
     console.error(`Error while proccessing text message`, e.message);
