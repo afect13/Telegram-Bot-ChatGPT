@@ -1,7 +1,6 @@
 import { Configuration, OpenAIApi } from "openai";
 import { createReadStream } from "fs";
 import config from "config";
-import { Context } from "telegraf";
 
 class OpenAI {
   roles = {
@@ -9,28 +8,30 @@ class OpenAI {
     SYSTEM: "system",
     USER: "user",
   };
-
   constructor(apiKey) {
     const configuration = new Configuration({
       apiKey,
     });
     this.openai = new OpenAIApi(configuration);
-    // this.lastError = null;
-    // this.lastMessages = null;
   }
   async chat(messages = []) {
-    try {
-      const completion = await this.openai.createChatCompletion({
-        model: "gpt-3.5-turbo",
-        messages,
-      });
-      // this.lastError = null; // Сброс ошибки при успешном выполнении
-      // this.lastMessages = messages; // Сохранение сообщений при успешном выполнении
-      return completion.data.choices[0].message;
-    } catch (e) {
-      console.error(`Error while chat completion: ${e.message}`);
-      return { content: "Ошибка попробуйте еще раз введите /restart" };
+    const maxAttempts = 5;
+    let attempts = 0;
+    while (attempts < maxAttempts) {
+      try {
+        const completion = await this.openai.createChatCompletion({
+          model: "gpt-3.5-turbo",
+          messages,
+        });
+        return completion.data.choices[0].message;
+      } catch (e) {
+        attempts++;
+        console.error(`Error (${e}) .`);
+        await new Promise((resolve) => setTimeout(resolve, 5000));
+        console.error(`Attempts (${attempts}).`);
+      }
     }
+    return { content: "Ошибка попробуйте еще раз" };
   }
 
   async transcription(filepath) {
