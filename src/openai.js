@@ -1,7 +1,7 @@
 import { Configuration, OpenAIApi } from "openai";
 import { createReadStream } from "fs";
 import config from "config";
-import { startSession } from "./utils.js";
+
 class OpenAI {
   roles = {
     ASSISTANT: "assistant",
