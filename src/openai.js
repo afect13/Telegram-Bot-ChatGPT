@@ -1,7 +1,7 @@
 import { Configuration, OpenAIApi } from "openai";
 import { createReadStream } from "fs";
 import config from "config";
-
+import { startSession } from "./utils.js";
 class OpenAI {
   roles = {
     ASSISTANT: "assistant",
@@ -26,14 +26,13 @@ class OpenAI {
         return completion.data.choices[0].message;
       } catch (e) {
         attempts++;
-        console.error(`Error (${e}) .`);
+        console.error(`Error (${e}).`);
         await new Promise((resolve) => setTimeout(resolve, 5000));
         console.error(`Attempts (${attempts}).`);
       }
     }
-    return { content: "Ошибка попробуйте еще раз" };
+    return { content: "ErrorSessionNeedTrimMessege" };
   }
-
   async transcription(filepath) {
     try {
       const response = await this.openai.createTranscription(createReadStream(filepath), "whisper-1");
