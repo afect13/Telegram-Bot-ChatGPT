@@ -15,26 +15,32 @@ bot.use(async (ctx, next) => {
   }
 });
 
-// bot.start(async (ctx) => {
-//   ctx.reply("Начнем? GPTChat готов :) ");
-//   ctx.session = INITIAL_SESSION;
-//   await ctx.reply("Жду вашего сообщения");
-// });
+bot.command("temp", async (ctx) => {
+  ctx.session ??= startSession();
+  const userId = ctx.from.id;
+  if (allowedUsers.includes(userId)) {
+    const keyboard = [];
+    for (let i = 1; i <= 10; i++) {
+      keyboard.push([{ text: i.toString(), callback_data: i.toString() }]);
+    }
+    ctx.reply(
+      `Это свойство позволяет контролировать степень "рискованности" ответов, которые будет предоставлять бот. Чем меньше значение, тем более предсказуемыми будут ответы. Чем больше значение, тем более "рискованными" и творческими могут быть ответы.`,
+      {
+        reply_markup: {
+          inline_keyboard: keyboard,
+          one_time_keyboard: true,
+        },
+      }
+    );
 
-// bot.command("start", async (ctx) => {
-//   ctx.session = INITIAL_SESSION;
-//   await ctx.reply("Жду вашего  сообщения");
-// });
-
-// bot.command("restart", async (ctx) => {
-//   const userId = ctx.from.id;
-//   if (userId === allowedUsers[0]) {
-//     ctx.reply("Выполняю перезапуск сервера...");
-//     exec("npm run restart");
-//   } else {
-//     ctx.reply("У вас нет прав на выполнение этой команды.");
-//   }
-// });
+    bot.action(/^(?:[1-9]|10)$/, async (ctx) => {
+      ctx.session.selectedTemp = ctx.match[0] / 10;
+      await ctx.answerCbQuery(`Вы установили значение ${ctx.session.selectedTemp * 10}`);
+    });
+  } else {
+    ctx.reply("Извините, у вас нет доступа к этой команде.");
+  }
+});
 
 bot.on(message("voice"), async (ctx) => {
   ctx.session ??= startSession();

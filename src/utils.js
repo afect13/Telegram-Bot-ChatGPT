@@ -15,6 +15,7 @@ export const gptMessage = (content, role = "user") => ({
 
 export const startSession = () => ({
   messages: [],
+  selectedTemp: 0.9,
 });
 
 export const trimSessionMessages = (messages) => {
