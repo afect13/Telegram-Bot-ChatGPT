@@ -1,14 +1,11 @@
 import { Telegraf, session } from "telegraf";
 import { message } from "telegraf/filters";
 import { proccessVoiceMessage, proccessTextMessage } from "./logic.js";
+import { startSession } from "./utils.js";
 import config from "config";
 const bot = new Telegraf(config.get("TELEGRAM_TOKEN"));
 const allowedUsers = config.get("ALLOWED_USERS");
-export const INITIAL_SESSION = {
-  messages: [],
-};
 bot.use(session());
-
 bot.use(async (ctx, next) => {
   const userId = ctx.from.id;
   if (allowedUsers.includes(userId)) {
@@ -18,16 +15,16 @@ bot.use(async (ctx, next) => {
   }
 });
 
-bot.start(async (ctx) => {
-  ctx.reply("Начнем? GPTChat готов :) ");
-  ctx.session = INITIAL_SESSION;
-  await ctx.reply("Жду вашего сообщения");
-});
+// bot.start(async (ctx) => {
+//   ctx.reply("Начнем? GPTChat готов :) ");
+//   ctx.session = INITIAL_SESSION;
+//   await ctx.reply("Жду вашего сообщения");
+// });
 
-bot.command("start", async (ctx) => {
-  ctx.session = INITIAL_SESSION;
-  await ctx.reply("Жду вашего  сообщения");
-});
+// bot.command("start", async (ctx) => {
+//   ctx.session = INITIAL_SESSION;
+//   await ctx.reply("Жду вашего  сообщения");
+// });
 
 // bot.command("restart", async (ctx) => {
 //   const userId = ctx.from.id;
@@ -40,12 +37,12 @@ bot.command("start", async (ctx) => {
 // });
 
 bot.on(message("voice"), async (ctx) => {
-  ctx.session ??= INITIAL_SESSION;
+  ctx.session ??= startSession();
   await proccessVoiceMessage(ctx);
 });
 
 bot.on(message("text"), async (ctx) => {
-  ctx.session ??= INITIAL_SESSION;
+  ctx.session ??= startSession();
   await proccessTextMessage(ctx);
 });
 

@@ -15,6 +15,7 @@ class OpenAI {
     this.openai = new OpenAIApi(configuration);
   }
   async chat(messages = []) {
+    console.log(messages);
     const maxAttempts = 5;
     let attempts = 0;
     while (attempts < maxAttempts) {
@@ -22,6 +23,7 @@ class OpenAI {
         const completion = await this.openai.createChatCompletion({
           model: "gpt-3.5-turbo",
           messages,
+          temperature: 0.5,
         });
         return completion.data.choices[0].message;
       } catch (e) {
