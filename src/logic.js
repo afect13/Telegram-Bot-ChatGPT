@@ -17,7 +17,7 @@ export async function proccessVoiceMessage(ctx) {
     removeFile(mp3Path);
     await ctx.reply(code(`Ваш запрос: ${text}`));
     await ctx.session.messages.push(gptMessage(text));
-    const response = await openai.chat(ctx.session.messages);
+    const response = await openai.chat(ctx.session.messages, ctx.session.selectedTemp);
     if (response.content === "ErrorSessionNeedTrimMessege") {
       await ctx.reply(`Ошибка 🤖 Повторите запрос`);
       ctx.session = startSession();
@@ -38,7 +38,7 @@ export async function proccessTextMessage(ctx) {
       ctx.session.messages = trimSessionMessages(ctx.session.messages);
     }
     ctx.session.messages.push(gptMessage(ctx.message.text));
-    const response = await openai.chat(ctx.session.messages);
+    const response = await openai.chat(ctx.session.messages, ctx.session.selectedTemp);
     if (response.content === "ErrorSessionNeedTrimMessege") {
       await ctx.reply(`Ошибка 🤖 Повторите запрос`);
       ctx.session = startSession();
