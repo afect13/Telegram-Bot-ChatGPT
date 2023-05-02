@@ -1,11 +1,14 @@
 import { code } from "telegraf/format";
 import { openai } from "./openai.js";
 import { ogg } from "./ogg.js";
-import { gptMessage, removeFile, trimSessionMessages, trimSessionMessagesAfterError } from "./utils.js";
+import { gptMessage, removeFile, trimSessionMessages, startSession } from "./utils.js";
 
 export async function proccessVoiceMessage(ctx) {
   try {
     ctx.replyWithChatAction("typing");
+    if (ctx.session.messages.length > 8) {
+      ctx.session.messages = trimSessionMessages(ctx.session.messages);
+    }
     const link = await ctx.telegram.getFileLink(ctx.message.voice.file_id);
     const userId = String(ctx.message.from.id);
     const oggPath = await ogg.create(link.href, userId);
@@ -14,15 +17,10 @@ export async function proccessVoiceMessage(ctx) {
     removeFile(mp3Path);
     await ctx.reply(code(`Ваш запрос: ${text}`));
     await ctx.session.messages.push(gptMessage(text));
-    if (ctx.session.messages.length > 8) {
-      trimSessionMessages(ctx.session.messages);
-    }
     const response = await openai.chat(ctx.session.messages);
     if (response.content === "ErrorSessionNeedTrimMessege") {
       await ctx.reply(`Ошибка 🤖 Повторите запрос`);
-      if (ctx.session.messages.length >= 2) {
-        trimSessionMessagesAfterError(ctx.session.messages);
-      }
+      ctx.session = startSession();
     } else {
       ctx.session.messages.push(gptMessage(response.content, openai.roles.ASSISTANT));
       await ctx.reply(response.content);
@@ -36,17 +34,14 @@ export async function proccessVoiceMessage(ctx) {
 export async function proccessTextMessage(ctx) {
   try {
     ctx.replyWithChatAction("typing");
-    ctx.session.messages.push(gptMessage(ctx.message.text));
-
     if (ctx.session.messages.length > 8) {
-      trimSessionMessages(ctx.session.messages);
+      ctx.session.messages = trimSessionMessages(ctx.session.messages);
     }
+    ctx.session.messages.push(gptMessage(ctx.message.text));
     const response = await openai.chat(ctx.session.messages);
     if (response.content === "ErrorSessionNeedTrimMessege") {
       await ctx.reply(`Ошибка 🤖 Повторите запрос`);
-      if (ctx.session.messages.length >= 2) {
-        trimSessionMessagesAfterError(ctx.session.messages);
-      }
+      ctx.session = startSession();
     } else {
       ctx.session.messages.push(gptMessage(response.content, openai.roles.ASSISTANT));
       await ctx.reply(response.content);
