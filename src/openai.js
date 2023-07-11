@@ -8,8 +8,9 @@ class OpenAI {
     SYSTEM: "system",
     USER: "user",
   };
-  constructor(apiKey) {
+  constructor(apiKey, organization) {
     const configuration = new Configuration({
+      organization,
       apiKey,
     });
     this.openai = new OpenAIApi(configuration);
@@ -44,4 +45,4 @@ class OpenAI {
   }
 }
 
-export const openai = new OpenAI(config.get("OPENAI_API_KEY"));
+export const openai = new OpenAI(config.get("OPENAI_API_KEY"), config.get("OPENAI_ORG_ID"));
