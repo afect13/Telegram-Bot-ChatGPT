@@ -3,7 +3,7 @@ import { message } from "telegraf/filters";
 import { proccessVoiceMessage, proccessTextMessage } from "./logic.js";
 import { startSession } from "./utils.js";
 import config from "config";
-const bot = new Telegraf(config.get("TELEGRAM_TOKEN"));
+const bot = new Telegraf(config.get("TELEGRAM_TOKEN"), { handlerTimeout: 9_000_000 });
 const allowedUsers = config.get("ALLOWED_USERS");
 bot.use(session());
 bot.use(async (ctx, next) => {
