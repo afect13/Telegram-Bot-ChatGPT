@@ -32,6 +32,7 @@ export async function proccessVoiceMessage(ctx) {
 }
 
 export async function proccessTextMessage(ctx) {
+  ctx.replyWithChatAction("typing");
   try {
     if (ctx.session.messages.length > 8) {
       ctx.session.messages = trimSessionMessages(ctx.session.messages);
