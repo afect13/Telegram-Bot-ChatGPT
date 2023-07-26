@@ -33,7 +33,6 @@ export async function proccessVoiceMessage(ctx) {
 
 export async function proccessTextMessage(ctx) {
   try {
-    ctx.replyWithChatAction("typing");
     if (ctx.session.messages.length > 8) {
       ctx.session.messages = trimSessionMessages(ctx.session.messages);
     }
@@ -44,7 +43,9 @@ export async function proccessTextMessage(ctx) {
       ctx.session = startSession();
     } else {
       ctx.session.messages.push(gptMessage(response.content, openai.roles.ASSISTANT));
-      await ctx.reply(response.content);
+      await ctx.replyWithHTML(response.content, {
+        parse_mode: "Markdown",
+      });
     }
   } catch (e) {
     await ctx.reply(`Ошибка. ${e.message}`);
